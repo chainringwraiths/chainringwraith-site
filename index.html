@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b0f14" />
     <title>Chainring Wraiths</title>
     <meta
       name="description"
@@ -68,18 +69,15 @@
         top: 0;
         z-index: 50;
         backdrop-filter: saturate(140%) blur(8px);
-        background: linear-gradient(
-          0deg,
-          rgba(17, 22, 28, 0.85),
-          rgba(17, 22, 28, 0.85)
-        );
+        background: rgba(17, 22, 28, 0.6);
         border-bottom: 1px solid var(--border);
       }
       .nav-inner {
-        height: 64px;
+        height: 6px;
         display: flex;
         align-items: center;
         justify-content: space-between;
+        font-family: Cinzel, Georgia, serif;
       }
       .brand {
         display: inline-flex;
@@ -97,6 +95,16 @@
         width: 28px;
         border-radius: 4px;
         object-fit: cover;
+      }
+      @media (min-width: 720px) {
+        .brand img {
+          height: 96px;
+          width: 96px;
+        }
+        .nav-inner {
+          height: 128px;
+          font-size: 36px;
+        }
       }
       .brand span {
         font-variant-ligatures: none;
@@ -151,7 +159,7 @@
       .hero-content {
         position: relative;
         z-index: 1;
-        padding: 80px 0;
+        padding: clamp(48px, 12vw, 96px) 0;
       }
       .eyebrow {
         display: inline-block;
@@ -180,6 +188,7 @@
         margin-top: 22px;
         display: flex;
         gap: 14px;
+        flex-wrap: wrap;
       }
       .btn {
         display: inline-block;
@@ -299,6 +308,150 @@
         flex-wrap: wrap;
         gap: 8px;
       }
+      /* Enhanced ride cards */
+      .ride-card {
+        position: relative;
+        overflow: hidden;
+        padding: 0;
+      }
+      .ride-card::after {
+        content: "";
+        position: absolute;
+        inset: 0 0 0 auto;
+        width: 4px;
+        background: linear-gradient(180deg, var(--accent), var(--accent-2));
+        opacity: 0.7;
+      }
+      .ride-head {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 12px;
+      }
+      .ride-title {
+        margin: 0;
+        font-size: 20px;
+        letter-spacing: 0.2px;
+      }
+      .date-pill {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        color: #0b0f14;
+        box-shadow: 0 6px 20px rgba(124, 58, 237, 0.35);
+        font-weight: 800;
+      }
+      .date-day {
+        font-size: 20px;
+        line-height: 1;
+      }
+      .date-mon {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.9;
+      }
+      .date-wrap {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .days-til {
+        font-size: 11px;
+        line-height: 1;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+      .open-icon {
+        opacity: 0.85;
+        font-size: 14px;
+      }
+      .location-chip {
+        position: absolute;
+        right: 14px;
+        bottom: 14px;
+        background: rgba(17, 22, 28, 0.6);
+        color: var(--muted);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 6px 10px;
+        pointer-events: none;
+        backdrop-filter: blur(2px);
+      }
+      .corner-chips {
+        position: absolute;
+        right: 14px;
+        bottom: 14px;
+        display: flex;
+        gap: 8px;
+        pointer-events: none;
+      }
+      .chip {
+        background: rgba(17, 22, 28, 0.6);
+        color: var(--muted);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 6px 10px;
+        backdrop-filter: blur(2px);
+      }
+      .chip-days {
+        color: #c4b5fd;
+        border-color: rgba(124, 58, 237, 0.35);
+        background: rgba(124, 58, 237, 0.12);
+        display: none;
+      }
+      .ride-card .card-link {
+        display: block;
+        width: 100%;
+        height: 100%;
+        padding: 18px 18px 64px;
+      }
+      /* Mobile tweaks */
+      @media (max-width: 720px) {
+        .container {
+          padding: 0 16px;
+        }
+        .nav-inner {
+          height: 56px;
+        }
+        .nav-links {
+          gap: 12px;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+        }
+        .nav-links::-webkit-scrollbar {
+          display: none;
+        }
+        .tagline {
+          font-size: 16px;
+        }
+        .ride-title {
+          font-size: 18px;
+        }
+        .date-day {
+          font-size: 18px;
+        }
+        .date-mon {
+          font-size: 11px;
+        }
+        .sponsor-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .sponsor img {
+          height: 56px;
+        }
+      }
+      @media (max-width: 380px) {
+        .core-grid {
+          grid-template-columns: 1fr;
+        }
+        .sponsor-grid {
+          grid-template-columns: 1fr;
+        }
+      }
       .status {
         font-size: 12px;
         padding: 4px 8px;
@@ -366,9 +519,41 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
+        cursor: pointer;
+        transition: box-shadow 120ms ease, border-color 120ms ease,
+          transform 120ms ease;
       }
       .core-name {
         font-weight: 700;
+      }
+      .core-card:hover {
+        border-color: var(--accent);
+        box-shadow: 0 8px 28px rgba(124, 58, 237, 0.25);
+        transform: translateY(-1px);
+      }
+      .core-card.active {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px var(--ring) inset,
+          0 10px 30px rgba(124, 58, 237, 0.35);
+      }
+      .filter-indicator {
+        margin-top: 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--muted);
+      }
+      .filter-indicator .clear-btn {
+        border: 1px solid var(--border);
+        background: rgba(17, 22, 28, 0.6);
+        color: var(--text);
+        padding: 4px 8px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .status-selected {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 1px var(--accent) inset;
       }
       /* Sponsors */
       .sponsors {
@@ -393,6 +578,28 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        cursor: pointer;
+        transition: box-shadow 120ms ease, transform 120ms ease,
+          border-color 120ms ease;
+      }
+      .sponsor:hover {
+        box-shadow: 0 0 0 2px var(--accent) inset,
+          0 12px 28px rgba(124, 58, 237, 0.35);
+        border-color: var(--accent);
+        transform: translateY(-1px);
+      }
+      .sponsor a {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+        border-radius: inherit;
+      }
+      .sponsor a:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+        border-radius: 10px;
       }
       .sponsor img {
         max-width: 100%;
@@ -406,28 +613,20 @@
     <header class="nav" role="banner">
       <div class="container nav-inner">
         <a class="brand" href="#" aria-label="Chainring Wraiths Home">
-          <img
-            src="assets/chainstyle cropped.png"
-            alt="Chainring Wraiths logo"
-          />
+          <img src="assets/chainstyle-white.png" alt="Chainring Wraiths logo" />
           <span>Chainring Wraiths</span>
         </a>
         <nav class="nav-links" aria-label="Primary">
-          <a href="#lore">Lore</a>
           <a href="#rides">Rides</a>
-          <a href="#roster">Roster</a>
-          <a class="cta" href="#join">Join the Ride</a>
         </nav>
       </div>
     </header>
 
     <section class="hero" role="region" aria-label="Hero">
       <div class="container hero-content">
-        <span class="eyebrow">Eight wheels for mortal cyclists</span>
+        <span class="eyebrow">One ride to rule them all</span>
         <h1>Chainring Wraiths</h1>
-        <p class="tagline">
-          Where aero meets Mordor. One gear to rule them all (plus 11 more).
-        </p>
+        <p class="tagline">Where aero meets Mordor</p>
         <div class="cta-row">
           <a class="btn primary" href="#rides">View Upcoming Rides</a>
           <a class="btn ghost" href="#lore">Read the Lore</a>
@@ -449,6 +648,25 @@
         </p>
       </section>
 
+      <section id="roster" class="section">
+        <h2>The Four Riders</h2>
+        <h3 style="margin: 0 0 10px">Core Riders</h3>
+        <div class="core-grid" aria-label="Core Riders">
+          <div class="core-card" data-rider="Sam" role="button" tabindex="0">
+            <span class="core-name">Sam</span><span class="badge">Leader</span>
+          </div>
+          <div class="core-card" data-rider="San" role="button" tabindex="0">
+            <span class="core-name">San</span>
+          </div>
+          <div class="core-card" data-rider="Blake" role="button" tabindex="0">
+            <span class="core-name">Blake</span>
+          </div>
+          <div class="core-card" data-rider="Rich" role="button" tabindex="0">
+            <span class="core-name">Rich</span>
+          </div>
+        </div>
+      </section>
+
       <section id="rides" class="section">
         <h2>Upcoming Rides</h2>
         <div class="legend" aria-label="Legend">
@@ -460,22 +678,18 @@
         <div id="rides-grid" class="grid rides-grid" aria-live="polite"></div>
       </section>
 
-      <section id="roster" class="section">
-        <h2>The Four Riders</h2>
-        <h3 style="margin: 0 0 10px">Core Riders</h3>
-        <div class="core-grid" aria-label="Core Riders">
-          <div class="core-card">
-            <span class="core-name">Sam</span><span class="badge">Leader</span>
-          </div>
-          <div class="core-card"><span class="core-name">San</span></div>
-          <div class="core-card"><span class="core-name">Blake</span></div>
-          <div class="core-card"><span class="core-name">Rich</span></div>
-        </div>
-      </section>
-
       <section id="sponsors" class="section sponsors">
         <h2>Sponsors</h2>
         <div class="sponsor-grid">
+          <div class="sponsor">
+            <a
+              href="https://www.mtndev.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img src="assets/mtndev.png" alt="mtndev sponsor" />
+            </a>
+          </div>
           <div class="sponsor">
             <a
               href="https://www.tubal-reversal.net/"
@@ -490,11 +704,11 @@
           </div>
           <div class="sponsor">
             <a
-              href="https://www.mtndev.com/"
+              href="https://refittherapy.com/"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <img src="assets/mtndev.png" alt="mtndev sponsor" />
+              <img src="assets/refit-therapy.svg" alt="Refit Therapy sponsor" />
             </a>
           </div>
         </div>
@@ -507,8 +721,20 @@
           humor mandatory.
         </p>
         <div class="cta-row">
-          <a class="btn primary" href="#">Pledge Your Allegiance</a>
-          <a class="btn ghost" href="#">Whisper to the Wraiths</a>
+          <a
+            href="mailto:chainringwraiths@gmail.com"
+            target="_blank"
+            class="btn primary"
+            href="#"
+            >Pledge Your Allegiance</a
+          >
+          <a
+            href="mailto:chainringwraiths@gmail.com"
+            target="_blank"
+            class="btn ghost"
+            href="#"
+            >Whisper to the Wraiths</a
+          >
         </div>
       </section>
     </main>
@@ -540,18 +766,19 @@
 
       // Fallback CSV embedded to support file:// viewing without a server
       const fallbackCsv = `Date,Description,Distance,Location,Website,Sam,Blake,San,Rich,Austin,Bill,Other
-9/10/2025,OCCX - Weeknight Training Series,20 - 40 Minutes,"Raleigh, NC",https://www.bikereg.com/cxcentral-occx25,r,,,,,,
-9/17/2025,OCCX - Weeknight Training Series,20 - 40 Minutes,"Raleigh, NC",https://www.bikereg.com/cxcentral-occx25,r,,,,,,
-9/20/2025,Kershaw Gold Rush,83,"Kershaw, SC",https://www.southeastgravel.com/2025-kershaw-gold-rush,r,r,n,r,r,,
-9/24/2025,OCCX - Weeknight Training Series,20 - 40 Minutes,"Raleigh, NC",https://www.bikereg.com/cxcentral-occx25,n,,,,,,
-9/27/2025,CX Central - Camp Kanata,30 minutes,"Wake Forest, NC",https://www.bikereg.com/cxcentral-kanatacx,x,,,,,,
-10/4/2025,CX Central - Sandhills,30 minutes,"Pinehurst, NC",https://www.bikereg.com/cxcentral-sandhillscx,x,,,,,,
-10/5/2025,CX Central - Rock Quarry,30 minutes,"Durham, NC",Not Posted Yet,x,,,,,,
-10/11/2025,2025 NCCX Race #1 Gibsonville,45 minutes,"Gibsonville, NC",https://www.bikereg.com/nccxrace1gibsonville,x,x,?,,,,
-10/12/2025,2025 NCCX Race #2 Raleigh,45 minutes,"Raleigh, NC",https://www.bikereg.com/nccxrace2raleigh,x,x,?,,,,
-10/19/2025,2025 NCCX Race #3 Boone,45 minutes,"Boone, NC",https://www.bikereg.com/nccxrace3boone,x,?,n,,,,
-10/25/2025,2025 NCCX Race #4 Winston Salem,45 minutes,"Winston Salem, NC",https://www.bikereg.com/nccxrace4winstonsalem,?,,,,,,
-10/26/2025,2025 NCCX Race #5 Winston Salem,45 minutes,"Winston Salem, NC",https://www.bikereg.com/nccxrace5winstonsalem,n,x,,,,,`;
+      9/10/2025,OCCX - Weeknight Training Series,20 - 40 Minutes,"Raleigh, NC",https://www.bikereg.com/cxcentral-occx25,r,,,,,,
+      9/17/2025,OCCX - Weeknight Training Series,20 - 40 Minutes,"Raleigh, NC",https://www.bikereg.com/cxcentral-occx25,r,,,,,,
+      9/20/2025,Kershaw Gold Rush,83,"Kershaw, SC",https://www.southeastgravel.com/2025-kershaw-gold-rush,r,r,n,r,r,,
+      9/24/2025,OCCX - Weeknight Training Series,20 - 40 Minutes,"Raleigh, NC",https://www.bikereg.com/cxcentral-occx25,n,,,,,,
+      9/27/2025,CX Central - Camp Kanata,30 minutes,"Wake Forest, NC",https://www.bikereg.com/cxcentral-kanatacx,x,,,,,,
+      10/4/2025,CX Central - Sandhills,30 minutes,"Pinehurst, NC",https://www.bikereg.com/cxcentral-sandhillscx,x,,,,,,
+      10/5/2025,CX Central - Rock Quarry,30 minutes,"Durham, NC",Not Posted Yet,x,,,,,,
+      10/11/2025,2025 NCCX Race #1 Gibsonville,45 minutes,"Gibsonville, NC",https://www.bikereg.com/nccxrace1gibsonville,x,x,?,,,,
+      10/12/2025,2025 NCCX Race #2 Raleigh,45 minutes,"Raleigh, NC",https://www.bikereg.com/nccxrace2raleigh,x,x,?,,,,
+      10/19/2025,2025 NCCX Race #3 Boone,45 minutes,"Boone, NC",https://www.bikereg.com/nccxrace3boone,x,?,n,,,,
+      10/25/2025,2025 NCCX Race #4 Winston Salem,45 minutes,"Winston Salem, NC",https://www.bikereg.com/nccxrace4winstonsalem,?,,,,,,
+      10/26/2025,2025 NCCX Race #5 Winston Salem,45 minutes,"Winston Salem, NC",https://www.bikereg.com/nccxrace5winstonsalem,n,x,,,,,
+      11/22/2025,2025 North Carolina Grand Prix,30 minutes,"Hendersonville, NC",https://www.bikereg.com/nccxncgp2025,?,,,,,,`;
 
       function parseCsv(text) {
         const lines = text.split(/\r?\n/).filter(Boolean);
@@ -595,14 +822,13 @@
         const [date, description, distance, location, website, ...statuses] =
           row;
         const article = document.createElement("article");
-        article.className = "card";
+        article.className = "card ride-card";
         const title = document.createElement("h3");
+        title.className = "ride-title";
         title.textContent = `${description}`;
         const meta = document.createElement("p");
         meta.className = "ride-meta";
-        meta.textContent = `${date} • ${distance}${
-          distance ? " • " : ""
-        }${location}`;
+        meta.textContent = `${distance}`;
         // Build per-card URL: direct if looks like URL, otherwise Google search
         let url = toUrl(website);
         if (!url) {
@@ -629,9 +855,55 @@
         anchor.target = "_blank";
         anchor.rel = "noopener";
         anchor.className = "card-link";
-        anchor.appendChild(title);
+        // Build a colorful date pill
+        const d = new Date(date);
+        const month = d.toLocaleString(undefined, { month: "short" });
+        const day = String(d.getDate());
+        const dateWrap = document.createElement("span");
+        dateWrap.className = "date-wrap";
+        const datePill = document.createElement("span");
+        datePill.className = "date-pill";
+        const dayEl = document.createElement("span");
+        dayEl.className = "date-day";
+        dayEl.textContent = day;
+        const monEl = document.createElement("span");
+        monEl.className = "date-mon";
+        monEl.textContent = month;
+        datePill.appendChild(dayEl);
+        datePill.appendChild(monEl);
+        const daysTil = document.createElement("span");
+        daysTil.className = "chip chip-days";
+        const now = new Date();
+        const diffMs =
+          new Date(d.toDateString()) - new Date(now.toDateString());
+        const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+        daysTil.textContent = `${
+          diffDays >= 0 ? diffDays : Math.abs(diffDays)
+        } ${diffDays === 1 ? "day" : "days"}`;
+        dateWrap.appendChild(datePill);
+        // move days chip to corner with location
+
+        const head = document.createElement("div");
+        head.className = "ride-head";
+        head.appendChild(dateWrap);
+        head.appendChild(title);
+        // External icon
+        const icon = document.createElement("span");
+        icon.className = "open-icon";
+        icon.innerHTML = "&#8599;";
+        head.appendChild(icon);
+
+        anchor.appendChild(head);
         anchor.appendChild(meta);
         if (attendees.children.length) anchor.appendChild(attendees);
+        const chips = document.createElement("div");
+        chips.className = "corner-chips";
+        const loc = document.createElement("span");
+        loc.className = "chip";
+        loc.textContent = location;
+        chips.appendChild(loc);
+        chips.appendChild(daysTil);
+        article.appendChild(chips);
         article.appendChild(anchor);
         return article;
       }
@@ -662,6 +934,15 @@
         return null;
       }
 
+      let activeRider = null; // e.g., 'Sam'
+
+      function riderStatusIncluded(statuses, riderName) {
+        const idx = memberKeys.indexOf(riderName);
+        if (idx === -1) return false;
+        const s = statuses[idx]?.toLowerCase();
+        return Boolean(s);
+      }
+
       async function loadRides() {
         const grid = document.getElementById("rides-grid");
         grid.innerHTML = "";
@@ -673,13 +954,19 @@
         const textToParse = fallbackCsv;
         try {
           const rows = parseCsv(textToParse);
-          const filtered = rows.filter((r) =>
+          const all = rows.filter((r) =>
             /\d{1,2}\/\d{1,2}\/\d{4}/.test(r[0] ?? "")
           );
+          const filtered = activeRider
+            ? all.filter((row) =>
+                riderStatusIncluded(row.slice(5), activeRider)
+              )
+            : all;
           console.info("loadRides:parsed", {
             totalRows: rows.length,
             filtered: filtered.length,
             sample: filtered.slice(0, 2),
+            activeRider,
           });
           filtered.forEach((row) => grid.appendChild(createRideCard(row)));
           if (!grid.children.length) {
@@ -695,6 +982,64 @@
       document.getElementById("year").textContent = String(
         new Date().getFullYear()
       );
+
+      // Rider filter interactions
+      function ensureFilterIndicator() {
+        let indicator = document.getElementById("rider-filter");
+        if (!indicator) {
+          const ridesSection = document.getElementById("rides");
+          const legend = ridesSection?.querySelector(".legend");
+          indicator = document.createElement("div");
+          indicator.id = "rider-filter";
+          indicator.className = "filter-indicator";
+          const label = document.createElement("span");
+          label.innerHTML = 'Filtering by <strong id="filter-name"></strong>';
+          const btn = document.createElement("button");
+          btn.id = "clear-filter";
+          btn.type = "button";
+          btn.className = "clear-btn";
+          btn.textContent = "Clear";
+          indicator.appendChild(label);
+          indicator.appendChild(btn);
+          legend?.insertAdjacentElement("afterend", indicator);
+        }
+        return indicator;
+      }
+
+      function setActiveRider(name) {
+        activeRider = name;
+        const indicator = ensureFilterIndicator();
+        const nameEl = indicator.querySelector("#filter-name");
+        if (activeRider && nameEl) nameEl.textContent = activeRider;
+        if (activeRider) indicator.style.display = "inline-flex";
+        else indicator.style.display = "none";
+        document.querySelectorAll(".core-card").forEach((el) => {
+          if (el.getAttribute("data-rider") === activeRider)
+            el.classList.add("active");
+          else el.classList.remove("active");
+        });
+        loadRides();
+      }
+
+      document.querySelectorAll(".core-card[data-rider]").forEach((card) => {
+        card.addEventListener("click", () => {
+          const name = card.getAttribute("data-rider");
+          setActiveRider(activeRider === name ? null : name);
+        });
+        card.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            const name = card.getAttribute("data-rider");
+            setActiveRider(activeRider === name ? null : name);
+          }
+        });
+      });
+
+      document.addEventListener("click", (e) => {
+        const tgt = e.target;
+        if (tgt && tgt.id === "clear-filter") setActiveRider(null);
+      });
+
       loadRides();
     </script>
   </body>
