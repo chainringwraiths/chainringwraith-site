@@ -9,6 +9,50 @@
       name="description"
       content="Chainring Wraiths — a cycling coven of shadowy speed"
     />
+    <link rel="canonical" href="https://chainringwraiths.cc/" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <link rel="icon" href="assets/chainstyle-white.png" />
+    <link rel="apple-touch-icon" href="assets/chainstyle-white.png" />
+    <meta property="og:site_name" content="Chainring Wraiths" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://chainringwraiths.cc/" />
+    <meta property="og:title" content="Chainring Wraiths" />
+    <meta
+      property="og:description"
+      content="Chainring Wraiths — a cycling coven of shadowy speed"
+    />
+    <meta
+      property="og:image"
+      content="https://chainringwraiths.cc/assets/wraiths.jpg"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Google tag (gtag.js) — replace G-XXXXXXX with your GA4 Measurement ID -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-XXXXXXX");
+    </script>
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Chainring Wraiths",
+        "url": "https://chainringwraiths.cc/",
+        "description": "Chainring Wraiths — a cycling coven of shadowy speed",
+        "inLanguage": "en"
+      }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -142,8 +186,11 @@
         content: "";
         position: absolute;
         inset: 0;
-        background: url("assets/cover.JPG") center/cover no-repeat;
-        filter: brightness(0.45) saturate(0.9) contrast(1.05);
+        background-image: var(--hero-bg, url("assets/cover.JPG"));
+        background-position: var(--hero-pos, center);
+        background-size: cover;
+        background-repeat: no-repeat;
+        filter: grayscale(1) brightness(0.45) contrast(1.05);
       }
       .hero::after {
         content: "";
@@ -160,6 +207,39 @@
         position: relative;
         z-index: 1;
         padding: clamp(48px, 12vw, 96px) 0;
+      }
+      .hero-controls {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 8px;
+        z-index: 1;
+        pointer-events: none;
+      }
+      .hero-btn {
+        pointer-events: auto;
+        width: 44px;
+        height: 44px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(17, 22, 28, 0.55);
+        color: var(--text);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(3px);
+        cursor: pointer;
+      }
+      .hero-btn:hover {
+        background: rgba(17, 22, 28, 0.75);
+      }
+      @media (min-width: 720px) {
+        .hero-btn {
+          width: 52px;
+          height: 52px;
+        }
       }
       .eyebrow {
         display: inline-block;
@@ -581,6 +661,11 @@
         cursor: pointer;
         transition: box-shadow 120ms ease, transform 120ms ease,
           border-color 120ms ease;
+        /* When using background-image on the sponsor, ensure it covers */
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        min-height: 88px;
       }
       .sponsor:hover {
         box-shadow: 0 0 0 2px var(--accent) inset,
@@ -623,6 +708,24 @@
     </header>
 
     <section class="hero" role="region" aria-label="Hero">
+      <div class="hero-controls" aria-hidden="false">
+        <button
+          id="hero-prev"
+          class="hero-btn"
+          aria-label="Previous background"
+          title="Previous"
+        >
+          &#8592;
+        </button>
+        <button
+          id="hero-next"
+          class="hero-btn"
+          aria-label="Next background"
+          title="Next"
+        >
+          &#8594;
+        </button>
+      </div>
       <div class="container hero-content">
         <span class="eyebrow">One ride to rule them all</span>
         <h1>Chainring Wraiths</h1>
@@ -670,10 +773,10 @@
       <section id="rides" class="section">
         <h2>Upcoming Rides</h2>
         <div class="legend" aria-label="Legend">
-          <span class="status status-r">r = Registered</span>
-          <span class="status status-x">x = Probably</span>
-          <span class="status status-q">? = Hopefully</span>
-          <span class="status status-n">n = Not attending</span>
+          <span class="status status-r">Registered</span>
+          <span class="status status-x">Probably</span>
+          <span class="status status-q">Hopefully</span>
+          <span class="status status-n">Not attending</span>
         </div>
         <div id="rides-grid" class="grid rides-grid" aria-live="polite"></div>
       </section>
@@ -681,13 +784,15 @@
       <section id="sponsors" class="section sponsors">
         <h2>Sponsors</h2>
         <div class="sponsor-grid">
-          <div class="sponsor">
+          <div
+            class="sponsor"
+            style="background-image: url('assets/mtndev-wide.png')"
+          >
             <a
               href="https://www.mtndev.com/"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <img src="assets/mtndev.png" alt="mtndev sponsor" />
             </a>
           </div>
           <div class="sponsor">
@@ -699,6 +804,7 @@
               <img
                 src="assets/personal-choice.webp"
                 alt="Personal Choice sponsor"
+                style="padding: 8px"
               />
             </a>
           </div>
@@ -940,7 +1046,8 @@
         const idx = memberKeys.indexOf(riderName);
         if (idx === -1) return false;
         const s = statuses[idx]?.toLowerCase();
-        return Boolean(s);
+        // Exclude 'n' (not attending). Show r/x/?
+        return Boolean(s) && s !== "n";
       }
 
       async function loadRides() {
@@ -982,6 +1089,47 @@
       document.getElementById("year").textContent = String(
         new Date().getFullYear()
       );
+
+      // Hero background rotator with grayscale images
+      const heroImages = [
+        "assets/cover.JPG",
+        "assets/103159277-Croatan_Buck_Fifty_2025-759.JPG",
+        "assets/103159278-Croatan_Buck_Fifty_2025_Highlights-83.JPG",
+        "assets/103159279-Croatan_Buck_Fifty_2025-725.JPG",
+      ];
+      let heroIdx = 0;
+      let heroTimer = null;
+      function applyHeroBg() {
+        const url = `url("${heroImages[heroIdx]}")`;
+        document.documentElement.style.setProperty("--hero-bg", url);
+        // For images at indices 1 and 3 (2nd and 4th), anchor to top
+        const pos = heroIdx === 1 || heroIdx === 3 ? "top" : "center";
+        document.documentElement.style.setProperty("--hero-pos", pos);
+      }
+      function nextHero(step = 1) {
+        heroIdx = (heroIdx + step + heroImages.length) % heroImages.length;
+        applyHeroBg();
+      }
+      function startHeroAuto() {
+        stopHeroAuto();
+        heroTimer = setInterval(() => nextHero(1), 8000);
+      }
+      function stopHeroAuto() {
+        if (heroTimer) clearInterval(heroTimer);
+      }
+      applyHeroBg();
+      startHeroAuto();
+
+      document.getElementById("hero-prev")?.addEventListener("click", () => {
+        stopHeroAuto();
+        nextHero(-1);
+        startHeroAuto();
+      });
+      document.getElementById("hero-next")?.addEventListener("click", () => {
+        stopHeroAuto();
+        nextHero(1);
+        startHeroAuto();
+      });
 
       // Rider filter interactions
       function ensureFilterIndicator() {
