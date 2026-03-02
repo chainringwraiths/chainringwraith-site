@@ -692,6 +692,62 @@
         object-fit: contain;
         filter: grayscale(25%);
       }
+
+      /* Rides tabs */
+      .rides-tabs {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 16px;
+        background: var(--bg-elev);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 4px;
+        width: fit-content;
+      }
+      .rides-tab {
+        padding: 8px 20px;
+        border: none;
+        border-radius: 10px;
+        background: transparent;
+        color: var(--muted);
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 120ms ease, color 120ms ease;
+      }
+      .rides-tab:hover {
+        color: var(--text);
+      }
+      .rides-tab.active {
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        color: #0b0f14;
+        box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+      }
+
+      /* Empty state */
+      .empty-state {
+        text-align: center;
+        padding: 48px 24px;
+        border: 1px dashed var(--border);
+        border-radius: 14px;
+        background: var(--bg-elev);
+        grid-column: 1 / -1;
+      }
+      .empty-state .empty-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+      }
+      .empty-state h3 {
+        font-family: Cinzel, Georgia, serif;
+        font-size: 22px;
+        margin: 0 0 8px;
+      }
+      .empty-state p {
+        color: var(--muted);
+        max-width: 44ch;
+        margin: 0 auto;
+      }
     </style>
   </head>
   <body>
@@ -752,7 +808,7 @@
       </section>
 
       <section id="roster" class="section">
-        <h2>The Four Riders</h2>
+        <h2>The Five Riders</h2>
         <h3 style="margin: 0 0 10px">Core Riders</h3>
         <div class="core-grid" aria-label="Core Riders">
           <div class="core-card" data-rider="Sam" role="button" tabindex="0">
@@ -767,11 +823,32 @@
           <div class="core-card" data-rider="Rich" role="button" tabindex="0">
             <span class="core-name">Rich</span>
           </div>
+          <div class="core-card" data-rider="Jim" role="button" tabindex="0">
+            <span class="core-name">Jim</span>
+          </div>
         </div>
       </section>
 
       <section id="rides" class="section">
-        <h2>Upcoming Rides</h2>
+        <h2>Rides</h2>
+        <div class="rides-tabs" role="tablist" aria-label="Ride tabs">
+          <button
+            class="rides-tab active"
+            role="tab"
+            aria-selected="true"
+            data-tab="upcoming"
+          >
+            Upcoming
+          </button>
+          <button
+            class="rides-tab"
+            role="tab"
+            aria-selected="false"
+            data-tab="archive"
+          >
+            Archive
+          </button>
+        </div>
         <div class="legend" aria-label="Legend">
           <span class="status status-r">Registered</span>
           <span class="status status-x">Probably</span>
@@ -849,8 +926,8 @@
       </div>
     </footer>
 
+    <script src="rides-data.js"></script>
     <script>
-      const csvPath = "Chainring Wraiths - 2025.csv";
       const statusMap = {
         r: "status-r",
         x: "status-x",
@@ -865,23 +942,10 @@
         "Austin",
         "Bill",
         "Other",
+        "Jim",
       ];
 
-      // Fallback CSV embedded to support file:// viewing without a server
-      const fallbackCsv = `Date,Description,Distance,Location,Website,Sam,Blake,San,Rich,Austin,Bill,Other
-      9/10/2025,OCCX - Weeknight Training Series,20 - 40 Minutes,"Raleigh, NC",https://www.bikereg.com/cxcentral-occx25,r,,,,,,
-      9/17/2025,OCCX - Weeknight Training Series,20 - 40 Minutes,"Raleigh, NC",https://www.bikereg.com/cxcentral-occx25,r,,,,,,
-      9/20/2025,Kershaw Gold Rush,83,"Kershaw, SC",https://www.southeastgravel.com/2025-kershaw-gold-rush,r,r,n,r,r,,
-      9/24/2025,OCCX - Weeknight Training Series,20 - 40 Minutes,"Raleigh, NC",https://www.bikereg.com/cxcentral-occx25,n,,,,,,
-      9/27/2025,CX Central - Camp Kanata,30 minutes,"Wake Forest, NC",https://www.bikereg.com/cxcentral-kanatacx,x,,,,,,
-      10/4/2025,CX Central - Sandhills,30 minutes,"Pinehurst, NC",https://www.bikereg.com/cxcentral-sandhillscx,x,,,,,,
-      10/5/2025,CX Central - Rock Quarry,30 minutes,"Durham, NC",Not Posted Yet,x,,,,,,
-      10/11/2025,2025 NCCX Race #1 Gibsonville,45 minutes,"Gibsonville, NC",https://www.bikereg.com/nccxrace1gibsonville,x,x,?,,,,
-      10/12/2025,2025 NCCX Race #2 Raleigh,45 minutes,"Raleigh, NC",https://www.bikereg.com/nccxrace2raleigh,x,x,?,,,,
-      10/19/2025,2025 NCCX Race #3 Boone,45 minutes,"Boone, NC",https://www.bikereg.com/nccxrace3boone,x,?,n,,,,
-      10/25/2025,2025 NCCX Race #4 Winston Salem,45 minutes,"Winston Salem, NC",https://www.bikereg.com/nccxrace4winstonsalem,?,,,,,,
-      10/26/2025,2025 NCCX Race #5 Winston Salem,45 minutes,"Winston Salem, NC",https://www.bikereg.com/nccxrace5winstonsalem,n,x,,,,,
-      11/22/2025,2025 North Carolina Grand Prix,30 minutes,"Hendersonville, NC",https://www.bikereg.com/nccxncgp2025,?,,,,,,`;
+      let allRides = [];
 
       function parseCsv(text) {
         const lines = text.split(/\r?\n/).filter(Boolean);
@@ -1011,72 +1075,84 @@
         return article;
       }
 
-      async function tryFetchCsv(paths) {
-        for (const path of paths) {
-          try {
-            console.info("loadRides:fetch:attempt", {
-              path,
-              protocol: location.protocol,
-            });
-            const res = await fetch(path, { cache: "no-store" });
-            console.info("loadRides:fetch:response", {
-              ok: res.ok,
-              status: res.status,
-              statusText: res.statusText,
-            });
-            if (!res.ok) continue;
-            const text = await res.text();
-            if (text && text.trim().length > 0) return text;
-          } catch (e) {
-            console.warn("loadRides:fetch:error", {
-              path,
-              message: e?.message,
-            });
-          }
-        }
-        return null;
-      }
-
-      let activeRider = null; // e.g., 'Sam'
+      let activeRider = null;
+      let activeTab = "upcoming";
 
       function riderStatusIncluded(statuses, riderName) {
         const idx = memberKeys.indexOf(riderName);
         if (idx === -1) return false;
         const s = statuses[idx]?.toLowerCase();
-        // Exclude 'n' (not attending). Show r/x/?
         return Boolean(s) && s !== "n";
       }
 
-      async function loadRides() {
+      function splitRides(rows) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const upcoming = [];
+        const archive = [];
+        for (const row of rows) {
+          const d = new Date(row[0]);
+          if (isNaN(d.getTime())) continue;
+          d.setHours(0, 0, 0, 0);
+          if (d >= today) upcoming.push(row);
+          else archive.push(row);
+        }
+        archive.reverse();
+        return { upcoming, archive };
+      }
+
+      function renderEmptyUpcoming() {
+        return `<div class="empty-state">
+          <div class="empty-icon">🏰</div>
+          <h3>The Riders Have Retreated to Minas Morgul</h3>
+          <p>The Wraiths have withdrawn behind the dead city's walls. No rides have been summoned yet — check back soon before the Nazgûl ride out again.</p>
+        </div>`;
+      }
+
+      function renderEmptyArchive() {
+        return `<div class="empty-state">
+          <div class="empty-icon">📜</div>
+          <h3>The Scrolls Are Blank</h3>
+          <p>No ancient ride records found. The lore keepers must still be writing.</p>
+        </div>`;
+      }
+
+      function renderRides() {
         const grid = document.getElementById("rides-grid");
         grid.innerHTML = "";
-        console.info("loadRides:start", {
-          href: location.href,
-          protocol: location.protocol,
+        const { upcoming, archive } = splitRides(allRides);
+        const source = activeTab === "upcoming" ? upcoming : archive;
+        const filtered = activeRider
+          ? source.filter((row) =>
+              riderStatusIncluded(row.slice(5), activeRider)
+            )
+          : source;
+        console.info("renderRides", {
+          activeTab,
+          total: source.length,
+          filtered: filtered.length,
+          activeRider,
         });
-        // Always use embedded CSV for now
-        const textToParse = fallbackCsv;
+        if (!filtered.length) {
+          grid.innerHTML =
+            activeTab === "upcoming"
+              ? renderEmptyUpcoming()
+              : renderEmptyArchive();
+          return;
+        }
+        filtered.forEach((row) => grid.appendChild(createRideCard(row)));
+      }
+
+      function loadRides() {
         try {
-          const rows = parseCsv(textToParse);
-          const all = rows.filter((r) =>
+          const rows = parseCsv(RIDES_CSV);
+          allRides = rows.filter((r) =>
             /\d{1,2}\/\d{1,2}\/\d{4}/.test(r[0] ?? "")
           );
-          const filtered = activeRider
-            ? all.filter((row) =>
-                riderStatusIncluded(row.slice(5), activeRider)
-              )
-            : all;
-          console.info("loadRides:parsed", {
-            totalRows: rows.length,
-            filtered: filtered.length,
-            sample: filtered.slice(0, 2),
-            activeRider,
-          });
-          filtered.forEach((row) => grid.appendChild(createRideCard(row)));
-          if (!grid.children.length) {
-            grid.innerHTML = '<p class="lead">No rides available.</p>';
-          }
+          console.info("loadRides:parsed", { totalRows: allRides.length });
+          renderRides();
         } catch (err) {
+          const grid = document.getElementById("rides-grid");
           grid.innerHTML =
             '<p class="lead">Could not load rides at this time.</p>';
           console.error("loadRides:parse:error", err);
@@ -1163,8 +1239,20 @@
             el.classList.add("active");
           else el.classList.remove("active");
         });
-        loadRides();
+        renderRides();
       }
+
+      document.querySelectorAll(".rides-tab").forEach((tab) => {
+        tab.addEventListener("click", () => {
+          activeTab = tab.getAttribute("data-tab") ?? "upcoming";
+          document.querySelectorAll(".rides-tab").forEach((t) => {
+            const isActive = t === tab;
+            t.classList.toggle("active", isActive);
+            t.setAttribute("aria-selected", String(isActive));
+          });
+          renderRides();
+        });
+      });
 
       document.querySelectorAll(".core-card[data-rider]").forEach((card) => {
         card.addEventListener("click", () => {
