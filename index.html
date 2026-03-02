@@ -808,7 +808,7 @@
       </section>
 
       <section id="roster" class="section">
-        <h2>The Five Riders</h2>
+        <h2>The Four Riders</h2>
         <h3 style="margin: 0 0 10px">Core Riders</h3>
         <div class="core-grid" aria-label="Core Riders">
           <div class="core-card" data-rider="Sam" role="button" tabindex="0">
@@ -823,31 +823,14 @@
           <div class="core-card" data-rider="Rich" role="button" tabindex="0">
             <span class="core-name">Rich</span>
           </div>
-          <div class="core-card" data-rider="Jim" role="button" tabindex="0">
-            <span class="core-name">Jim</span>
-          </div>
         </div>
       </section>
 
       <section id="rides" class="section">
         <h2>Rides</h2>
         <div class="rides-tabs" role="tablist" aria-label="Ride tabs">
-          <button
-            class="rides-tab active"
-            role="tab"
-            aria-selected="true"
-            data-tab="upcoming"
-          >
-            Upcoming
-          </button>
-          <button
-            class="rides-tab"
-            role="tab"
-            aria-selected="false"
-            data-tab="archive"
-          >
-            Archive
-          </button>
+          <button class="rides-tab active" role="tab" aria-selected="true" data-tab="upcoming">Upcoming</button>
+          <button class="rides-tab" role="tab" aria-selected="false" data-tab="archive">Archive</button>
         </div>
         <div class="legend" aria-label="Legend">
           <span class="status status-r">Registered</span>
@@ -926,8 +909,13 @@
       </div>
     </footer>
 
-    <script src="rides-data.js"></script>
     <script>
+      // Google Sheet: https://docs.google.com/spreadsheets/d/14lIKR4ulvcHv1ei4Dl3LbnQ4xAJshlnV-LNQm19Qmbw/
+      // Loaded via OpenSheet API (https://opensheet.elk.sh) — no auth, sheet must be "Anyone with link can view"
+      const SHEET_ID = "14lIKR4ulvcHv1ei4Dl3LbnQ4xAJshlnV-LNQm19Qmbw";
+      const SHEET_NAME_OR_INDEX = "1";
+      const SHEET_URL = `https://opensheet.elk.sh/${SHEET_ID}/${SHEET_NAME_OR_INDEX}`;
+
       const statusMap = {
         r: "status-r",
         x: "status-x",
@@ -945,36 +933,26 @@
         "Jim",
       ];
 
-      let allRides = [];
-
-      function parseCsv(text) {
-        const lines = text.split(/\r?\n/).filter(Boolean);
-        const header = lines.shift();
-        const rows = [];
-        for (const line of lines) {
-          const cells = [];
-          let cur = "";
-          let inQuotes = false;
-          for (let i = 0; i < line.length; i++) {
-            const ch = line[i];
-            if (ch === '"') {
-              if (inQuotes && line[i + 1] === '"') {
-                cur += '"';
-                i++;
-              } else {
-                inQuotes = !inQuotes;
-              }
-            } else if (ch === "," && !inQuotes) {
-              cells.push(cur.trim());
-              cur = "";
-            } else {
-              cur += ch;
+      /**
+       * Sheet columns: Date | Description | Distance | Location | Website | (URL) | Sam | Blake | San | Rich | Austin | Bill | Jim
+       * Put "Date" in A1 so OpenSheet maps it. The URL column (F) has no header; OpenSheet returns it as obj[""].
+       */
+      function sheetRowToArray(obj) {
+        const url = toUrl(obj[""] ?? obj.Website ?? "") ?? (obj.Website ?? "");
+        let date = obj.Date ?? "";
+        if (!date) {
+          for (const v of Object.values(obj)) {
+            if (typeof v === "string" && /\d{1,2}\/\d{1,2}\/\d{4}/.test(v)) {
+              date = v;
+              break;
             }
           }
-          cells.push(cur.trim());
-          if (cells.length > 1) rows.push(cells);
         }
-        return rows;
+        const description = obj.Description ?? "";
+        const distance = obj.Distance ?? "";
+        const location = obj.Location ?? "";
+        const statuses = memberKeys.map((k) => obj[k] ?? "");
+        return [date, description, distance, location, url, ...statuses];
       }
 
       function toUrl(val) {
@@ -1075,14 +1053,38 @@
         return article;
       }
 
+      async function fetchSheetJson() {
+        try {
+          const res = await fetch(SHEET_URL, { cache: "no-store" });
+          if (!res.ok) return null;
+          const data = await res.json();
+          return Array.isArray(data) ? data : null;
+        } catch (e) {
+          console.warn("loadRides:fetch:error", {
+            url: SHEET_URL,
+            message: e?.message,
+          });
+          return null;
+        }
+      }
+
       let activeRider = null;
       let activeTab = "upcoming";
+      let allRides = [];
 
       function riderStatusIncluded(statuses, riderName) {
         const idx = memberKeys.indexOf(riderName);
         if (idx === -1) return false;
         const s = statuses[idx]?.toLowerCase();
+        // Exclude 'n' (not attending). Show r/x/?
         return Boolean(s) && s !== "n";
+      }
+
+      function hasRegistrations(row) {
+        return row.slice(5).some((s) => {
+          const v = s?.toLowerCase();
+          return Boolean(v) && v !== "n";
+        });
       }
 
       function splitRides(rows) {
@@ -1095,7 +1097,7 @@
           if (isNaN(d.getTime())) continue;
           d.setHours(0, 0, 0, 0);
           if (d >= today) upcoming.push(row);
-          else archive.push(row);
+          else if (hasRegistrations(row)) archive.push(row);
         }
         archive.reverse();
         return { upcoming, archive };
@@ -1127,12 +1129,6 @@
               riderStatusIncluded(row.slice(5), activeRider)
             )
           : source;
-        console.info("renderRides", {
-          activeTab,
-          total: source.length,
-          filtered: filtered.length,
-          activeRider,
-        });
         if (!filtered.length) {
           grid.innerHTML =
             activeTab === "upcoming"
@@ -1143,16 +1139,23 @@
         filtered.forEach((row) => grid.appendChild(createRideCard(row)));
       }
 
-      function loadRides() {
+      async function loadRides() {
+        const grid = document.getElementById("rides-grid");
+        grid.innerHTML = "";
+        const jsonRows = await fetchSheetJson();
+        if (!jsonRows) {
+          grid.innerHTML =
+            '<p class="lead">Could not load rides at this time.</p>';
+          console.error("loadRides:sheetFetchFailed");
+          return;
+        }
         try {
-          const rows = parseCsv(RIDES_CSV);
-          allRides = rows.filter((r) =>
-            /\d{1,2}\/\d{1,2}\/\d{4}/.test(r[0] ?? "")
-          );
-          console.info("loadRides:parsed", { totalRows: allRides.length });
+          allRides = jsonRows
+            .map((obj) => sheetRowToArray(obj))
+            .filter((r) => (r[1] ?? "").trim().length > 0)
+            .filter((r) => /\d{1,2}\/\d{1,2}\/\d{4}/.test(r[0] ?? ""));
           renderRides();
         } catch (err) {
-          const grid = document.getElementById("rides-grid");
           grid.innerHTML =
             '<p class="lead">Could not load rides at this time.</p>';
           console.error("loadRides:parse:error", err);
