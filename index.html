@@ -829,8 +829,22 @@
       <section id="rides" class="section">
         <h2>Rides</h2>
         <div class="rides-tabs" role="tablist" aria-label="Ride tabs">
-          <button class="rides-tab active" role="tab" aria-selected="true" data-tab="upcoming">Upcoming</button>
-          <button class="rides-tab" role="tab" aria-selected="false" data-tab="archive">Archive</button>
+          <button
+            class="rides-tab active"
+            role="tab"
+            aria-selected="true"
+            data-tab="upcoming"
+          >
+            Upcoming
+          </button>
+          <button
+            class="rides-tab"
+            role="tab"
+            aria-selected="false"
+            data-tab="archive"
+          >
+            Archive
+          </button>
         </div>
         <div class="legend" aria-label="Legend">
           <span class="status status-r">Registered</span>
@@ -936,18 +950,55 @@
       /**
        * Sheet columns: Date | Description | Distance | Location | Website | (URL) | Sam | Blake | San | Rich | Austin | Bill | Jim
        * Put "Date" in A1 so OpenSheet maps it. The URL column (F) has no header; OpenSheet returns it as obj[""].
+       * Dates may be M/D/YYYY or weekday strings like "Saturday, October 10" (year inferred).
        */
+      function parseRideDate(dateStr) {
+        if (!dateStr?.trim()) return null;
+        const trimmed = dateStr.trim();
+
+        if (/\d{1,2}\/\d{1,2}\/\d{4}/.test(trimmed)) {
+          const d = new Date(trimmed);
+          return isNaN(d.getTime()) ? null : d;
+        }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const currentYear = today.getFullYear();
+        const candidates = [];
+
+        for (let year = currentYear - 1; year <= currentYear + 1; year++) {
+          const d = new Date(`${trimmed}, ${year}`);
+          if (isNaN(d.getTime())) continue;
+          d.setHours(0, 0, 0, 0);
+          candidates.push(d);
+        }
+
+        if (!candidates.length) return null;
+
+        const upcoming = candidates.filter((d) => d >= today);
+        if (upcoming.length) {
+          return upcoming.sort((a, b) => a - b)[0];
+        }
+        return candidates.sort((a, b) => b - a)[0];
+      }
+
+      function formatRideDate(date) {
+        return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+      }
+
       function sheetRowToArray(obj) {
-        const url = toUrl(obj[""] ?? obj.Website ?? "") ?? (obj.Website ?? "");
-        let date = obj.Date ?? "";
-        if (!date) {
+        const url = toUrl(obj[""] ?? obj.Website ?? "") ?? obj.Website ?? "";
+        let rawDate = obj.Date ?? "";
+        if (!rawDate) {
           for (const v of Object.values(obj)) {
-            if (typeof v === "string" && /\d{1,2}\/\d{1,2}\/\d{4}/.test(v)) {
-              date = v;
+            if (typeof v === "string" && parseRideDate(v)) {
+              rawDate = v;
               break;
             }
           }
         }
+        const parsedDate = parseRideDate(rawDate);
+        const date = parsedDate ? formatRideDate(parsedDate) : rawDate;
         const description = obj.Description ?? "";
         const distance = obj.Distance ?? "";
         const location = obj.Location ?? "";
@@ -1153,7 +1204,7 @@
           allRides = jsonRows
             .map((obj) => sheetRowToArray(obj))
             .filter((r) => (r[1] ?? "").trim().length > 0)
-            .filter((r) => /\d{1,2}\/\d{1,2}\/\d{4}/.test(r[0] ?? ""));
+            .filter((r) => parseRideDate(r[0] ?? "") !== null);
           renderRides();
         } catch (err) {
           grid.innerHTML =
