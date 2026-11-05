@@ -79,6 +79,123 @@
         --border: rgb(var(--line-rgb) / 0.25);
       }
 
+      /* Lord of the Maps variations (preview only, via ?palettes=<key>).
+         Same 8 colors, different jobs. */
+      :root[data-palette="shire"] {
+        /* olive page, near-black cards, moss-green buttons */
+        --bg: #272910;
+        --bg-rgb: 39 41 16;
+        --bg-elev: #1c1009;
+        --bg-elev-rgb: 28 16 9;
+        --accent: #526143;
+        --accent-rgb: 82 97 67;
+        --accent-2: #866350;
+        --line-rgb: 82 97 67;
+      }
+      :root[data-palette="mordor"] {
+        /* blood red everywhere, dark-brown cards */
+        --bg-elev: #432015;
+        --bg-elev-rgb: 67 32 21;
+        --accent: #823f3a;
+        --accent-rgb: 130 63 58;
+        --accent-2: #432015;
+        --line-rgb: 130 63 58;
+      }
+      :root[data-palette="khaki"] {
+        /* light khaki buttons with dark text */
+        --accent: #c0c188;
+        --accent-rgb: 192 193 136;
+        --accent-2: #a09878;
+        --on-accent: #1c1009;
+        --accent-soft: #a09878;
+      }
+      :root[data-palette="parchment"] {
+        /* light mode: parchment page, dark ink */
+        --bg: #c0c188;
+        --bg-rgb: 192 193 136;
+        --bg-elev: #a09878;
+        --bg-elev-rgb: 160 152 120;
+        --text: #1c1009;
+        --muted: #432015;
+        --accent: #823f3a;
+        --accent-rgb: 130 63 58;
+        --accent-2: #432015;
+        --accent-soft: #432015;
+        --on-accent: #c0c188;
+        --line-rgb: 67 32 21;
+      }
+      /* status badges need dark text on the light page */
+      :root[data-palette="parchment"] .status-r { color: #14532d; background: rgba(34, 197, 94, 0.3); }
+      :root[data-palette="parchment"] .status-x { color: #713f12; background: rgba(234, 179, 8, 0.35); }
+      :root[data-palette="parchment"] .status-q { color: #1e3a8a; background: rgba(59, 130, 246, 0.25); }
+      :root[data-palette="parchment"] .status-n { color: #7f1d1d; background: rgba(239, 68, 68, 0.25); }
+      /* keep the photo hero dark in parchment mode */
+      :root[data-palette="parchment"] .hero {
+        --bg: #1c1009;
+        --bg-rgb: 28 16 9;
+        --bg-elev-rgb: 39 41 16;
+        --text: #c0c188;
+        --muted: #a09878;
+        color: var(--text);
+      }
+
+      /* Palette picker bar (hidden unless ?palettes is in the URL) */
+      .palette-bar {
+        position: fixed;
+        left: 50%;
+        bottom: 12px;
+        transform: translateX(-50%);
+        z-index: 100;
+        display: flex;
+        gap: 6px;
+        max-width: calc(100vw - 16px);
+        overflow-x: auto;
+        padding: 6px;
+        border-radius: 14px;
+        background: rgb(var(--bg-elev-rgb) / 0.92);
+        border: 1px solid var(--border);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(8px);
+        scrollbar-width: none;
+      }
+      .palette-bar::-webkit-scrollbar {
+        display: none;
+      }
+      .palette-btn {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 5px;
+        padding: 6px 10px;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        background: transparent;
+        color: var(--text);
+        font: 600 12px/1.2 Inter, system-ui, sans-serif;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .palette-btn:hover {
+        background: rgb(var(--bg-rgb) / 0.5);
+      }
+      .palette-btn.active {
+        border-color: var(--accent);
+        background: rgb(var(--bg-rgb) / 0.6);
+      }
+      .palette-swatch {
+        display: flex;
+        height: 8px;
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .palette-swatch i {
+        flex: 1;
+      }
+      body.has-palette-bar footer {
+        padding-bottom: 84px;
+      }
+
       * {
         box-sizing: border-box;
       }
@@ -1335,6 +1452,64 @@
         if (tgt && tgt.id === "clear-filter") setActiveRider(null);
       });
 
+
+      // Palette preview: open with ?palettes (or ?palettes=<key>) to compare color schemes.
+      // Without the param the site looks exactly as before.
+      // Swatches show each variation's roles: page, cards, lines, button, button 2, text
+      const PALETTES = [
+        { key: "", name: "Lord (live)", colors: ["1c1009", "272910", "526143", "823f3a", "866350", "c0c188"] },
+        { key: "shire", name: "Shire", colors: ["272910", "1c1009", "526143", "526143", "866350", "c0c188"] },
+        { key: "mordor", name: "Mordor", colors: ["1c1009", "432015", "823f3a", "823f3a", "432015", "c0c188"] },
+        { key: "khaki", name: "Khaki", colors: ["1c1009", "272910", "526143", "c0c188", "a09878", "c0c188"] },
+        { key: "parchment", name: "Parchment", colors: ["c0c188", "a09878", "432015", "823f3a", "432015", "1c1009"] },
+      ];
+      function applyPalette(key) {
+        const root = document.documentElement;
+        if (key) root.setAttribute("data-palette", key);
+        else root.removeAttribute("data-palette");
+        const bg = getComputedStyle(root).getPropertyValue("--bg").trim();
+        document.querySelector('meta[name="theme-color"]')?.setAttribute("content", bg);
+        document.querySelectorAll(".palette-btn").forEach((b) =>
+          b.classList.toggle("active", b.dataset.key === key)
+        );
+        document
+          .querySelector(".palette-btn.active")
+          ?.scrollIntoView({ block: "nearest", inline: "nearest" });
+      }
+      (function initPaletteBar() {
+        const params = new URLSearchParams(location.search);
+        if (!params.has("palettes")) return;
+        const start = params.get("palettes") || "";
+        const bar = document.createElement("div");
+        bar.className = "palette-bar";
+        bar.setAttribute("aria-label", "Color palette preview");
+        PALETTES.forEach((p) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "palette-btn";
+          btn.dataset.key = p.key;
+          const sw = document.createElement("span");
+          sw.className = "palette-swatch";
+          p.colors.forEach((c) => {
+            const i = document.createElement("i");
+            i.style.background = `#${c}`;
+            sw.appendChild(i);
+          });
+          const label = document.createElement("span");
+          label.textContent = p.name;
+          btn.append(sw, label);
+          btn.addEventListener("click", () => {
+            applyPalette(p.key);
+            const u = new URL(location.href);
+            u.searchParams.set("palettes", p.key);
+            history.replaceState(null, "", u);
+          });
+          bar.appendChild(btn);
+        });
+        document.body.appendChild(bar);
+        document.body.classList.add("has-palette-bar");
+        applyPalette(PALETTES.some((p) => p.key === start) ? start : "");
+      })();
 
       loadRides();
     </script>
