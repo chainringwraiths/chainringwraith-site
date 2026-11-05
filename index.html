@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#0b0f14" />
+    <meta name="theme-color" content="#1c1009" />
     <title>Chainring Wraiths</title>
     <meta
       name="description"
@@ -61,42 +61,8 @@
     />
     <style>
       :root {
-        --bg: #0b0f14;
-        --bg-rgb: 11 15 20;
-        --bg-elev: #11161c;
-        --bg-elev-rgb: 17 22 28;
-        --text: #e6edf3;
-        --muted: #9aa4ae;
-        --accent: #7c3aed;
-        --accent-rgb: 124 58 237;
-        --accent-2: #9333ea;
-        --accent-soft: #c4b5fd;
-        --on-accent: #0b0f14;
-        --line-rgb: var(--accent-rgb);
-        --ring: rgb(var(--accent-rgb) / 0.35);
-        --border: rgb(var(--line-rgb) / 0.25);
-      }
-
-      /* Palette previews (only applied via ?palettes=…; default above is the live look).
-         Colors come from lospec.com palettes Sam picked. */
-      :root[data-palette="carver6"] {
-        /* https://lospec.com/palette-list/carver6 */
-        --bg: #000000;
-        --bg-rgb: 0 0 0;
-        --bg-elev: #402e20;
-        --bg-elev-rgb: 64 46 32;
-        --text: #ffb77d;
-        /* #815b3f alone is too dark to read on black; blend toward the peach */
-        --muted: color-mix(in srgb, #ffb77d 60%, #815b3f);
-        --accent: #ff5900;
-        --accent-rgb: 255 89 0;
-        --accent-2: #892d00;
-        --accent-soft: #ffb77d;
-        --on-accent: #000000;
-        --line-rgb: 129 91 63;
-      }
-      :root[data-palette="lord-of-the-maps"] {
-        /* https://lospec.com/palette-list/lord-of-the-maps */
+        /* Lord of the Maps palette: https://lospec.com/palette-list/lord-of-the-maps
+           c0c188 a09878 526143 272910 866350 823f3a 432015 1c1009 */
         --bg: #1c1009;
         --bg-rgb: 28 16 9;
         --bg-elev: #272910;
@@ -109,93 +75,8 @@
         --accent-soft: #c0c188;
         --on-accent: #c0c188;
         --line-rgb: 82 97 67;
-      }
-      :root[data-palette="bastille-8"] {
-        /* https://lospec.com/palette-list/bastille-8 */
-        --bg: #181923;
-        --bg-rgb: 24 25 35;
-        --bg-elev: #292d41;
-        --bg-elev-rgb: 41 45 65;
-        --text: #b59e90;
-        --muted: #8b7983;
-        --accent: #a58d89;
-        --accent-rgb: 165 141 137;
-        --accent-2: #6f687a;
-        --accent-soft: #b59e90;
-        --on-accent: #181923;
-        --line-rgb: 76 84 109;
-      }
-      :root[data-palette="nyx8"] {
-        /* https://lospec.com/palette-list/nyx8 */
-        --bg: #08141e;
-        --bg-rgb: 8 20 30;
-        --bg-elev: #0f2a3f;
-        --bg-elev-rgb: 15 42 63;
-        --text: #f6d6bd;
-        --muted: #c3a38a;
-        --accent: #997577;
-        --accent-rgb: 153 117 119;
-        --accent-2: #816271;
-        --accent-soft: #f6d6bd;
-        --on-accent: #08141e;
-        --line-rgb: 32 57 79;
-      }
-
-      /* Palette picker bar (hidden unless ?palettes is in the URL) */
-      .palette-bar {
-        position: fixed;
-        left: 50%;
-        bottom: 12px;
-        transform: translateX(-50%);
-        z-index: 100;
-        display: flex;
-        gap: 6px;
-        max-width: calc(100vw - 16px);
-        overflow-x: auto;
-        padding: 6px;
-        border-radius: 14px;
-        background: rgb(var(--bg-elev-rgb) / 0.92);
-        border: 1px solid var(--border);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(8px);
-        scrollbar-width: none;
-      }
-      .palette-bar::-webkit-scrollbar {
-        display: none;
-      }
-      .palette-btn {
-        flex: 0 0 auto;
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 5px;
-        padding: 6px 10px;
-        border: 1px solid transparent;
-        border-radius: 10px;
-        background: transparent;
-        color: var(--text);
-        font: 600 12px/1.2 Inter, system-ui, sans-serif;
-        cursor: pointer;
-        white-space: nowrap;
-      }
-      .palette-btn:hover {
-        background: rgb(var(--bg-rgb) / 0.5);
-      }
-      .palette-btn.active {
-        border-color: var(--accent);
-        background: rgb(var(--bg-rgb) / 0.6);
-      }
-      .palette-swatch {
-        display: flex;
-        height: 8px;
-        border-radius: 3px;
-        overflow: hidden;
-      }
-      .palette-swatch i {
-        flex: 1;
-      }
-      body.has-palette-bar footer {
-        padding-bottom: 84px;
+        --ring: rgb(var(--accent-rgb) / 0.35);
+        --border: rgb(var(--line-rgb) / 0.25);
       }
 
       * {
@@ -1454,63 +1335,6 @@
         if (tgt && tgt.id === "clear-filter") setActiveRider(null);
       });
 
-
-      // Palette preview: open with ?palettes (or ?palettes=<key>) to compare color schemes.
-      // Without the param the site looks exactly as before.
-      const PALETTES = [
-        { key: "", name: "Current", colors: ["0b0f14", "11161c", "7c3aed", "9333ea", "e6edf3"] },
-        { key: "carver6", name: "Carver6", colors: ["000000", "402e20", "815b3f", "ffb77d", "ff5900", "892d00"] },
-        { key: "lord-of-the-maps", name: "Lord of the Maps", colors: ["c0c188", "a09878", "526143", "272910", "866350", "823f3a", "432015", "1c1009"] },
-        { key: "bastille-8", name: "Bastille-8", colors: ["181923", "292d41", "38405d", "4c546d", "6f687a", "8b7983", "a58d89", "b59e90"] },
-        { key: "nyx8", name: "Nyx8", colors: ["08141e", "0f2a3f", "20394f", "f6d6bd", "c3a38a", "997577", "816271", "4e495f"] },
-      ];
-      function applyPalette(key) {
-        const root = document.documentElement;
-        if (key) root.setAttribute("data-palette", key);
-        else root.removeAttribute("data-palette");
-        const bg = getComputedStyle(root).getPropertyValue("--bg").trim();
-        document.querySelector('meta[name="theme-color"]')?.setAttribute("content", bg);
-        document.querySelectorAll(".palette-btn").forEach((b) =>
-          b.classList.toggle("active", b.dataset.key === key)
-        );
-        document
-          .querySelector(".palette-btn.active")
-          ?.scrollIntoView({ block: "nearest", inline: "nearest" });
-      }
-      (function initPaletteBar() {
-        const params = new URLSearchParams(location.search);
-        if (!params.has("palettes")) return;
-        const start = params.get("palettes") || "";
-        const bar = document.createElement("div");
-        bar.className = "palette-bar";
-        bar.setAttribute("aria-label", "Color palette preview");
-        PALETTES.forEach((p) => {
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.className = "palette-btn";
-          btn.dataset.key = p.key;
-          const sw = document.createElement("span");
-          sw.className = "palette-swatch";
-          p.colors.forEach((c) => {
-            const i = document.createElement("i");
-            i.style.background = `#${c}`;
-            sw.appendChild(i);
-          });
-          const label = document.createElement("span");
-          label.textContent = p.name;
-          btn.append(sw, label);
-          btn.addEventListener("click", () => {
-            applyPalette(p.key);
-            const u = new URL(location.href);
-            u.searchParams.set("palettes", p.key);
-            history.replaceState(null, "", u);
-          });
-          bar.appendChild(btn);
-        });
-        document.body.appendChild(bar);
-        document.body.classList.add("has-palette-bar");
-        applyPalette(PALETTES.some((p) => p.key === start) ? start : "");
-      })();
 
       loadRides();
     </script>
